@@ -95,7 +95,7 @@ function initTable() {
       { data: "ip", type: "ip-address" },
       { data: "comment" },
       { data: "groups", searchable: false },
-      { data: "name", width: "80px", orderable: false },
+      { data: "name", width: "22px", orderable: false },
     ],
     columnDefs: [
       {
@@ -215,7 +215,8 @@ function initTable() {
       $("td:eq(3)", row).html(button);
     },
     dom:
-      "<'row'<'col-sm-4'l><'col-sm-8'f>>" +
+      "<'row'<'col-sm-12'f>>" +
+      "<'row'<'col-sm-4'l><'col-sm-8'p>>" +
       "<'row'<'col-sm-12'<'table-responsive'tr>>>" +
       "<'row'<'col-sm-5'i><'col-sm-7'p>>",
     lengthMenu: [
@@ -229,6 +230,11 @@ function initTable() {
     },
     stateLoadCallback: function () {
       var data = utils.stateLoadCallback("groups-clients-table");
+
+      // Return if not available
+      if (data === null) {
+        return null;
+      }
 
       // Reset visibility of ID column
       data.columns[0].visible = false;

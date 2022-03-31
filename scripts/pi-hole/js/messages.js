@@ -88,6 +88,44 @@ function renderMessage(data, type, row) {
         " seconds)"
       );
 
+    case "DNSMASQ_WARN":
+      return (
+        "Warning in <code>dnsmasq</code> core:<pre>" +
+        row.message +
+        '</pre> Check out <a href="https://docs.pi-hole.net/ftldns/dnsmasq_warn/" target="_blank">our documentation</a> for further information.'
+      );
+
+    case "LOAD":
+      return (
+        "Long-term load (15min avg) larger than number of processors: <strong>" +
+        parseFloat(row.blob1).toFixed(1) +
+        " &gt; " +
+        parseInt(row.blob2, 10) +
+        "</strong><br>This may slow down DNS resolution and can cause bottlenecks."
+      );
+
+    case "SHMEM":
+      return (
+        "RAM shortage (<code>" +
+        utils.escapeHtml(row.message) +
+        "</code>) ahead: <strong>" +
+        parseInt(row.blob1, 10) +
+        "% used</strong><pre>" +
+        utils.escapeHtml(row.blob2) +
+        "</pre>"
+      );
+
+    case "DISK":
+      return (
+        "Disk shortage (<code>" +
+        utils.escapeHtml(row.message) +
+        "</code>) ahead: <strong>" +
+        parseInt(row.blob1, 10) +
+        "% used</strong><pre>" +
+        utils.escapeHtml(row.blob2) +
+        "</pre>"
+      );
+
     default:
       return "Unknown message type<pre>" + JSON.stringify(row) + "</pre>";
   }
@@ -136,7 +174,8 @@ $(function () {
       $("td:eq(3)", row).html(button);
     },
     dom:
-      "<'row'<'col-sm-4'l><'col-sm-8'f>>" +
+      "<'row'<'col-sm-12'f>>" +
+      "<'row'<'col-sm-4'l><'col-sm-8'p>>" +
       "<'row'<'col-sm-12'<'table-responsive'tr>>>" +
       "<'row'<'col-sm-5'i><'col-sm-7'p>>",
     lengthMenu: [
@@ -153,6 +192,10 @@ $(function () {
     },
     stateLoadCallback: function () {
       var data = utils.stateLoadCallback("messages-table");
+      // Return if not available
+      if (data === null) {
+        return null;
+      }
 
       // Reset visibility of ID and blob columns
       var hiddenCols = [0, 4, 5, 6, 7, 8];
